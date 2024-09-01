@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React Tutorial: Bygga en Produktlista</title>
+    <link rel="stylesheet" href="https://unpkg.com/mvp.css">
+
+    <style>
+        pre {
+            background-color: #eee;
+            padding: 8px
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <h1>React Tutorial: Bygga en Produktlista</h1>
+        <p>Denna lektion kommer att guida dig genom att skapa en produktlista med React där användaren kan lägga till,
+            editera och ta bort produkter. Vi kommer att använda Vite som byggverktyg för snabb utveckling.</p>
+
+        <h2>Förutsättningar</h2>
+        <p>För att följa denna lektion bör du ha grundläggande kunskaper i JavaScript och React. Se också till att du
+            har Node.js och npm installerat på din dator.</p>
+        <p>I denna lektionen kommer ni se React-komponenter som inte tar emot props på sättet ni är vana vid. Istället för <code>MyComponent(props)</code>
+        så kommer ni se <code>MyComponent({ prop1, prop2 })</code>. Om det känns udda så kan ni läsa en förklaring <a href="./extra.html">här</a>.</p>
+
+        <h2>Steg 1: Skapa en ny React-applikation med Vite</h2>
+        <p>Börja med att skapa en ny React-applikation med hjälp av Vite.</p>
+        <details>
+            <summary>Kodexempel</summary>
+            <pre>
+        npx create-vite@latest product-list --template react
+        cd product-list
+        npm install
+        </pre>
+        </details>
+        <p>När detta är klart, starta utvecklingsservern:</p>
+        <details>
+            <summary>Kodexempel</summary>
+            <pre>
+        npm run dev
+        </pre>
+        </details>
+
+        <h2>Steg 2: Skapa en <code>ProductCard</code>-komponent</h2>
+        <p>Skapa en ny komponent kallad <code>ProductCard</code>. Denna komponent ska ta emot <code>name</code>,
+            <code>description</code>, <code>price</code> och <code>imageSrc</code> som props och visa dessa i ett kort.
+        </p>
+        <details>
+            <summary>Kodexempel</summary>
+            <pre>
+&lt;!-- src/components/ProductCard.jsx --&gt;
+import React from 'react';
+import './ProductCard.css';
+
+// Här definierar vi ProductCard-komponenten och destrukturerar props direkt
+const ProductCard = ({ name, description, price, imageSrc, onEdit, onDelete }) => {
+    return (
+        &lt;div className="product-card"&gt;
+            &lt;img src={imageSrc} alt={name} className="product-image" /&gt;
+            &lt;h2&gt;{name}&lt;/h2&gt;
+            &lt;p&gt;{description}&lt;/p&gt;
+            &lt;p className="product-price"&gt;${price.toFixed(2)}&lt;/p&gt;
+            &lt;button onClick={onEdit}&gt;Edit&lt;/button&gt;
+            &lt;button onClick={onDelete}&gt;Delete&lt;/button&gt;
+        &lt;/div&gt;
+    );
+};
+
+export default ProductCard;
+        </pre>
+        </details>
+
+        <h2>Steg 3: Lägg till CSS för <code>ProductCard</code></h2>
+        <p>För att göra vår <code>ProductCard</code> snyggare, skapa en CSS-fil som matchar komponentens namn och lägg
+            till styling.</p>
+        <details>
+            <summary>Kodexempel</summary>
+            <pre>
+&lt;!-- src/components/ProductCard.css --&gt;
+.product-card {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+    max-width: 300px;
+    margin: 16px;
+}
+
+.product-image {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.product-price {
+    font-weight: bold;
+    color: #007bff;
+}
+        </pre>
+        </details>
+
+        <h2>Steg 4: Skapa en <code>ProductList</code>-komponent</h2>
+        <p>Skapa en ny komponent som heter <code>ProductList</code>. Denna komponent ska hålla en lista över produkter
+            och använda <code>ProductCard</code> för att visa varje produkt. Vi kommer nu att bryta ner detta steg i
+            mindre delar för att implementera funktionerna för att lägga till, editera och ta bort produkter.</p>
+
+        <h3>Steg 4.1: Lägg till ett formulär för att lägga till produkter</h3>
+        <p>För att användare ska kunna lägga till nya produkter, skapa ett formulär med input-fält för varje
+            produktattribut (name, description, price, imageSrc). Formuläret ska kunna skicka in en ny produkt till
+            produktlistan.</p>
+        <details>
+            <summary>Kodexempel</summary>
+            <pre>
+&lt;!-- src/components/ProductList.jsx --&gt;
+import React, { useState } from 'react';
+import ProductCard from './ProductCard';
+import './ProductList.css';
+
+const ProductList = () => {
+    const [products, setProducts] = useState([
+        {
+            id: 1,
+            name: 'Laptop',
+            description: 'A powerful laptop for professionals.',
+            price: 999.99,
+            imageSrc: 'https://via.placeholder.com/150',
+        },
+        {
+            id: 2,
+            name: 'Smartphone',
+            description: 'A smartphone with an excellent camera.',
+            price: 799.99,
+            imageSrc: 'https://via.placeholder.com/150',
+        },
+    ]);
+
+    const [newProduct, setNewProduct] = useState({
+        name: '',
+        description: '',
+        price: '',
+        imageSrc: ''
+    });
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setNewProduct({ ...newProduct, [name]: value });
+    };
+
+    const addProduct = () => {
+        const product = {
+            ...newProduct,
+            id: products.length + 1,
+            price: parseFloat(newProduct.price)
+        };
+        setProducts([...products, product]);
+        setNewProduct({ name: '', description: '', price: '', imageSrc: '' });
+    };
+
+    return (
+        &lt;div className="product-list"&gt;
+            &lt;form className="add-product-form"&gt;
+                &lt;input 
+                    type="text" 
+                    name="name" 
+                    placeholder="Name" 
+                    value={newProduct.name}
+                    onChange={handleInputChange}
+                /&gt;
+                &lt;input 
+                    type="text" 
+                    name="description" 
+                    placeholder="Description" 
+                    value={newProduct.description}
+                    onChange={handleInputChange}
+                /&gt;
+                &lt;input 
+                    type="number" 
+                    name="price" 
+                    placeholder="Price" 
+                    value={newProduct.price}
+                    onChange={handleInputChange}
+                /&gt;
+                &lt;input 
+                    type="text" 
+                    name="imageSrc" 
+                    placeholder="Image URL" 
+                    value={newProduct.imageSrc}
+                    onChange={handleInputChange}
+                /&gt;
+                &lt;button type="button" onClick={addProduct}&gt;Add Product&lt;/button&gt;
+            &lt;/form&gt;
+
+            {products.map(product => (
+                &lt;ProductCard
+                    key={product.id}
+                    name={product.name}
+                    description={product.description}
+                    price={product.price}
+                    imageSrc={product.imageSrc}
+                    onEdit={() => editProduct(product.id)}
+                    onDelete={() => deleteProduct(product.id)}
+                /&gt;
+            ))}
+        &lt;/div&gt;
+    );
+};
+
+export default ProductList;
+    </pre>
+        </details>
+
+        <h3>Steg 4.2: Implementera `deleteProduct`-funktionen</h3>
+        <p>Skapa en funktion som låter användaren ta bort produkter från listan. Denna funktion ska filtrera bort
+            produkten med det givna <code>id</code> från produktlistan.</p>
+        <details>
+            <summary>Kodexempel</summary>
+            <pre>
+&lt;!-- src/components/ProductList.jsx --&gt;
+const deleteProduct = (id) =&gt; {
+    setProducts(products.filter(product =&gt; product.id !== id));
+};
+    </pre>
+        </details>
+
+        <h3>Steg 4.3: Implementera `editProduct`-funktionen</h3>
+        <p>När användaren trycker på knappen "Edit" för en produkt, ska produkten visas i redigerbart läge där alla fält
+            (förutom id) kan ändras via input-fält. Skapa en funktion som hanterar detta.</p>
+        <details>
+            <summary>Kodexempel</summary>
+            <pre>
+&lt;!-- src/components/ProductList.jsx --&gt;
+const editProduct = (id) =&gt; {
+    const productToEdit = products.find(product =&gt; product.id === id);
+    const updatedName = prompt('Edit Name', productToEdit.name);
+    const updatedDescription = prompt('Edit Description', productToEdit.description);
+    const updatedPrice = parseFloat(prompt('Edit Price', productToEdit.price));
+    const updatedImageSrc = prompt('Edit Image URL', productToEdit.imageSrc);
+
+    setProducts(products.map(product =&gt;
+        product.id === id
+            ? { ...product, name: updatedName, description: updatedDescription, price: updatedPrice, imageSrc: updatedImageSrc }
+            : product
+    ));
+};
+    </pre>
+        </details>
+
+        <h3>Steg 4.4: Justera ProductCard-komponenten för redigering</h3>
+        <p>Uppdatera <code>ProductCard</code>-komponenten så att den innehåller input-fält i redigerbart läge när
+            användaren trycker på "Edit"-knappen.</p>
+        <details>
+            <summary>Kodexempel</summary>
+            <pre>
+&lt;!-- src/components/ProductCard.jsx --&gt;
+import React, { useState } from 'react';
+import './ProductCard.css';
+
+const ProductCard = ({ name, description, price, imageSrc, onEdit, onDelete }) => {
+    // useState används för att hålla reda på om produkten är i edit läge eller inte
+    const [isEditing, setIsEditing] = useState(false);
+
+    // Skapar en kopia av produktens värden som kan redigeras
+    const [editedProduct, setEditedProduct] = useState({ name, description, price, imageSrc });
+
+    // Hanterar ändringar i inputfält för redigerade värden
+    const handleInputChange = (e) =&gt; {
+        const { name, value } = e.target;
+        setEditedProduct({ ...editedProduct, [name]: value });
+    };
+
+    // När redigeringen är klar, avslutar vi redigeringsläget och skickar de nya värdena till föräldrakomponenten
+    const saveEdit = () =&gt; {
+        setIsEditing(false);
+        onEdit(editedProduct);
+    };
+
+    return (
+        &lt;div className="product-card"&gt;
+        // Om produkten är i redigeringsläge, visar vi inputfält för att kunna redigera värdena
+            {isEditing ? (
+                &lt;div&gt;
+                    &lt;input 
+                        type="text" 
+                        name="name" 
+                        value={editedProduct.name} 
+                        onChange={handleInputChange} 
+                    /&gt;
+                    &lt;input 
+                        type="text" 
+                        name="description" 
+                        value={editedProduct.description} 
+                        onChange={handleInputChange} 
+                    /&gt;
+                    &lt;input 
+                        type="number" 
+                        name="price" 
+                        value={editedProduct.price} 
+                        onChange={handleInputChange} 
+                    /&gt;
+                    &lt;input 
+                        type="text" 
+                        name="imageSrc" 
+                        value={editedProduct.imageSrc} 
+                        onChange={handleInputChange} 
+                    /&gt;
+                    &lt;button onClick={saveEdit}&gt;Save&lt;/button&gt;
+                &lt;/div&gt;
+            // Om produkten inte är i redigeringsläge, visar vi den vanliga produktsidan
+            ) : (
+                &lt;div&gt;
+                    &lt;img src={imageSrc} alt={name} className="product-image" /&gt;
+                    &lt;h2&gt;{name}&lt;/h2&gt;
+                    &lt;p&gt;{description}&lt;/p&gt;
+                    &lt;p className="product-price"&gt;${price.toFixed(2)}&lt;/p&gt;
+                    &lt;button onClick={() => setIsEditing(true)}&gt;Edit&lt;/button&gt;
+                    &lt;button onClick={onDelete}&gt;Delete&lt;/button&gt;
+                &lt;/div&gt;
+            )}
+        &lt;/div&gt;
+    );
+};
+
+export default ProductCard;
+    </pre>
+        </details>
+
+        <h3>Steg 4.5: Koppla `editProduct`-funktionen till `ProductCard`</h3>
+        <p>För att säkerställa att redigeringen fungerar korrekt, justera <code>ProductList</code>-komponenten så att
+            den uppdaterar rätt produkt när redigeringen är klar.</p>
+        <details>
+            <summary>Kodexempel</summary>
+            <pre>
+&lt;!-- src/components/ProductList.jsx --&gt;
+// Uppdaterar en produkt i listan när redigeringen är klar
+const editProduct = (updatedProduct) =&gt; {
+    setProducts(products.map(product =&gt;
+        product.id === updatedProduct.id ? updatedProduct : product
+    ));
+};
+    </pre>
+        </details>
+
+        <h2>Steg 5: Lägg till CSS för <code>ProductList</code></h2>
+        <p>För att strukturera och styla produktlistan, skapa en CSS-fil för <code>ProductList</code> och lägg till
+            styling.</p>
+        <details>
+            <summary>Kodexempel</summary>
+            <pre>
+&lt;!-- src/components/ProductList.css --&gt;
+.product-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.add-button {
+    margin: 20px;
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.add-button:hover {
+    background-color: #218838;
+}
+        </pre>
+        </details>
+
+        <h2>Steg 6: Använd <code>ProductList</code> i <code>App.jsx</code></h2>
+        <p>Nu när vi har våra komponenter klara, importera <code>ProductList</code> i <code>App.jsx</code> och använd
+            den för att visa produktlistan.</p>
+        <details>
+            <summary>Kodexempel</summary>
+            <pre>
+&lt;!-- src/App.jsx --&gt;
+import React from 'react';
+import ProductList from './components/ProductList';
+
+function App() {
+    return (
+        &lt;div&gt;
+            &lt;h1&gt;My Product List&lt;/h1&gt;
+            &lt;ProductList /&gt;
+        &lt;/div&gt;
+    );
+}
+
+export default App;
+        </pre>
+        </details>
+
+        <h2>Steg 7: Starta din applikation</h2>
+        <p>Kör applikationen och testa att lägga till, editera och ta bort produkter. Se till att allt fungerar som
+            förväntat.</p>
+        <details>
+            <summary>Kodexempel</summary>
+            <pre>
+npm run dev
+        </pre>
+        </details>
+
+        <h2>Avslutning</h2>
+        <p>Du har nu skapat en komplett produktlista i React där användare kan lägga till, redigera och ta bort
+            produkter. Detta är en stark grund för att bygga vidare på en mer avancerad applikation.</p>
+    </main>
+</body>
+
+</html>

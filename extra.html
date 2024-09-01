@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React Tutorial: Bygga en Produktlista</title>
+    <link rel="stylesheet" href="https://unpkg.com/mvp.css">
+
+    <style>
+        pre {
+            background-color: #eee;
+            padding: 8px
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <h2>Förklaring av Objekt Destrukturering</h2>
+        <p>
+            Objekt destrukturering är en funktion i JavaScript som gör det möjligt att plocka ut värden från ett objekt
+            och tilldela dem till variabler på ett enkelt och tydligt sätt. Istället för att manuellt skriva ut och
+            hämta varje egenskap från objektet, kan du använda destrukturering för att direkt extrahera de värden du
+            behöver.
+        </p>
+
+        <h3>Exempel på Objekt Destrukturering</h3>
+        <p>Anta att du har ett objekt som representerar en person:</p>
+        <pre>
+<code>
+const person = {
+  firstName: 'John',
+  lastName: 'Doe',
+  age: 30,
+  occupation: 'Developer'
+};
+</code>
+</pre>
+        <p>
+            Normalt skulle du hämta värden från objektet så här:
+        </p>
+        <pre>
+<code>
+const firstName = person.firstName;
+const lastName = person.lastName;
+const age = person.age;
+const occupation = person.occupation;
+</code>
+</pre>
+        <p>
+            Med objekt destrukturering kan du skriva samma sak på ett mycket mer kompakt sätt:
+        </p>
+        <pre>
+<code>
+const { firstName, lastName, age, occupation } = person;
+</code>
+</pre>
+        <p>
+            Nu har du fyra variabler <code>firstName</code>, <code>lastName</code>, <code>age</code>, och
+            <code>occupation</code> som innehåller motsvarande värden från <code>person</code>-objektet.
+        </p>
+
+        <h2>Användning av Destrukturering med <code>props</code> i React</h2>
+        <p>
+            I React-komponenter används ofta <code>props</code> för att skicka data till komponenten. Destrukturering är
+            särskilt användbar här för att snabbt extrahera och använda dessa <code>props</code>.
+        </p>
+
+        <h3>Exempel på Destrukturering av <code>props</code></h3>
+        <p>Anta att du har en komponent <code>UserProfile</code> som tar emot <code>props</code> med <code>name</code>,
+            <code>age</code>, och <code>occupation</code>:</p>
+        <pre>
+<code>
+const UserProfile = (props) => {
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;{props.name}&lt;/h1&gt;
+      &lt;p&gt;Age: {props.age}&lt;/p&gt;
+      &lt;p&gt;Occupation: {props.occupation}&lt;/p&gt;
+    &lt;/div&gt;
+  );
+};
+</code>
+</pre>
+        <p>
+            Du kan använda objekt destrukturering för att göra koden mer läsbar:
+        </p>
+        <pre>
+<code>
+const UserProfile = ({ name, age, occupation }) => {
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;{name}&lt;/h1&gt;
+      &lt;p&gt;Age: {age}&lt;/p&gt;
+      &lt;p&gt;Occupation: {occupation}&lt;/p&gt;
+    &lt;/div&gt;
+  );
+};
+</code>
+</pre>
+        <p>
+            I detta exempel har vi destrukturerat <code>props</code> direkt i funktionssignaturen. Detta gör att vi kan
+            referera till <code>name</code>, <code>age</code>, och <code>occupation</code> direkt, vilket gör koden mer
+            kompakt och lättare att förstå.
+        </p>
+
+        <p><strong>Sammanfattning:</strong> Objekt destrukturering är ett kraftfullt sätt att enkelt extrahera värden
+            från ett objekt, vilket gör din kod mer läsbar och lättare att underhålla. I React-komponenter är det
+            särskilt användbart när du arbetar med <code>props</code> för att undvika upprepningar och förbättra kodens
+            tydlighet.</p>
+    </main>
+</body>
+
+</htm
